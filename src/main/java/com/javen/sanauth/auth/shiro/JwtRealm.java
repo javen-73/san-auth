@@ -1,13 +1,18 @@
 package com.javen.sanauth.auth.shiro;
 
-import org.apache.shiro.authc.AuthenticationException;
-import org.apache.shiro.authc.AuthenticationInfo;
-import org.apache.shiro.authc.AuthenticationToken;
-import org.apache.shiro.authc.SimpleAuthenticationInfo;
+import com.javen.sanauth.auth.entity.User;
+import com.javen.sanauth.auth.service.UserService;
+import com.javen.sanauth.commons.utils.JwtUtil;
+import io.jsonwebtoken.Jwts;
+import org.apache.shiro.authc.*;
 import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import java.net.PasswordAuthentication;
+import java.util.Objects;
 
 public class JwtRealm extends AuthorizingRealm {
 
@@ -15,6 +20,9 @@ public class JwtRealm extends AuthorizingRealm {
     public boolean supports(AuthenticationToken token) {
         return token instanceof JWTToken;
     }
+
+    @Autowired
+    private UserService userService;
 
     /**
      * 授权   --具体可以访问那些路径
@@ -25,6 +33,7 @@ public class JwtRealm extends AuthorizingRealm {
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principalCollection) {
         SimpleAuthorizationInfo authorizationInfo = new SimpleAuthorizationInfo();
         authorizationInfo.addStringPermission("sys:test");
+        System.out.println("赋予权限信息");
         return authorizationInfo;
     }
 
@@ -37,8 +46,11 @@ public class JwtRealm extends AuthorizingRealm {
     @Override
     protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken authenticationToken) throws AuthenticationException {
         JWTToken token = (JWTToken) authenticationToken;
-        System.out.println(token.getCredentials());
-        System.out.println("已进入登录");
-        return new SimpleAuthenticationInfo(token,token.getCredentials(),"jwtRealm");
+        String username = JwtUtil.parse(token.getToken());
+        User user = userService.findUserByName(username);
+        if(Objects.isNull(user)){
+            throw new AuthenticationException("User didn't existed!");
+        }
+        return new SimpleAuthenticationInfo(user,user,"jwtRealm");
     }
 }

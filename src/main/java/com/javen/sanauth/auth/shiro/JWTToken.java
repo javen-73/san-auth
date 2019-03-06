@@ -1,7 +1,9 @@
 package com.javen.sanauth.auth.shiro;
 
+import lombok.Data;
 import org.apache.shiro.authc.AuthenticationToken;
 
+@Data
 public class JWTToken implements AuthenticationToken {
 
     // 密钥

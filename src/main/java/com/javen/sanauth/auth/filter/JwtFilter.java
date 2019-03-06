@@ -2,7 +2,7 @@ package com.javen.sanauth.auth.filter;
 
 import com.alibaba.fastjson.JSON;
 import com.javen.sanauth.auth.shiro.JWTToken;
-import com.javen.sanauth.commons.returnUtils.Result;
+import com.javen.sanauth.commons.returnDTO.ResultDTO;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.web.filter.authc.BasicHttpAuthenticationFilter;
 import org.springframework.http.HttpStatus;
@@ -80,19 +80,19 @@ public class JwtFilter extends BasicHttpAuthenticationFilter {
         //获取请求token，如果token不存在，直接返回401
         String token = req.getHeader(AUTHORIZATION_HEADER);
         if(StringUtils.isEmpty(token)){
-            String json = JSON.toJSONString(new Result(HttpStatus.UNAUTHORIZED.value(), "invalid token",null));
+            String json = JSON.toJSONString(new ResultDTO(HttpStatus.UNAUTHORIZED.value(), "invalid token",null));
             httpResponse.getWriter().print(json);
             return false;
         }
         // 未认证的情况
         if (null == subject || !subject.isAuthenticated()) {
             // 告知JWT认证失败
-            String json = JSON.toJSONString(new Result(HttpStatus.UNAUTHORIZED.value(), "error jwt",null));
+            String json = JSON.toJSONString(new ResultDTO(HttpStatus.UNAUTHORIZED.value(), "error jwt",null));
             httpResponse.getWriter().print(json);
         }else {
             //  已经认证但未授权的情况
             // 告知客户端JWT没有权限访问此资源
-            String json = JSON.toJSONString(new Result(HttpStatus.FORBIDDEN.value(), "no permission",null));
+            String json = JSON.toJSONString(new ResultDTO(HttpStatus.FORBIDDEN.value(), "no permission",null));
             httpResponse.getWriter().print(json);
         }
         return false;

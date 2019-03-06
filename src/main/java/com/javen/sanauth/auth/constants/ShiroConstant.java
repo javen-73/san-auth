@@ -1,5 +1,7 @@
 package com.javen.sanauth.auth.constants;
 
 public class ShiroConstant {
-    private static final String AUTHORIZETION = "authorizetion";
+    public static final String AUTHORIZETION = "authorizetion";
+
+    public static final String ENCRYPTOR = "javen";
 }
